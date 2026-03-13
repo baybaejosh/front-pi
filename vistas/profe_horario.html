@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>SAES - Mi Horario Docente</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <script src="../js/api_config.js"></script>
+    <style>
+        .horario-container {
+            max-width: 1000px;
+            margin: 20px auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+            height: 70px;
+        }
+
+        th {
+            background: #6c1d45;
+            color: white;
+        }
+
+        .bloque-hora {
+            background: #f4f4f4;
+            font-weight: bold;
+            color: #6c1d45;
+            width: 110px;
+        }
+
+        .clase-profe {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            color: #e65100;
+            padding: 5px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="horario-container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2>📅 Horario de Clases (Profesor)</h2>
+            <button class="btn-guinda" onclick="window.location.href='../dashboard.html'">Volver</button>
+        </div>
+        <table id="tablaHorario">
+            <thead>
+                <tr>
+                    <th class="bloque-hora">Hora</th>
+                    <th>Lunes</th>
+                    <th>Martes</th>
+                    <th>Miércoles</th>
+                    <th>Jueves</th>
+                    <th>Viernes</th>
+                </tr>
+            </thead>
+            <tbody id="cuerpoHorario"></tbody>
+        </table>
+    </div>
+
+    <script>
+        const bloques = ["07:00-08:30", "08:30-10:00", "10:30-12:00", "12:00-13:30", "16:00-17:30", "17:30-19:00", "19:00-20:30", "20:30-22:00"];
+        const dias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];
+
+        function init() {
+            const tbody = document.getElementById('cuerpoHorario');
+            bloques.forEach(b => {
+                let f = `<tr><td class="bloque-hora">${b}</td>`;
+                dias.forEach(d => f += `<td id="${d}-${b}"></td>`);
+                tbody.innerHTML += f + `</tr>`;
+            });
+            cargarHorarioProfe();
+        }
+
+        async function cargarHorarioProfe() {
+            const user = JSON.parse(localStorage.getItem('saes_usuario'));
+            // Endpoint en Go que filtra por RFC del profesor
+            const res = await fetch(`${API_GO_URL}/profesor/${user.boleta_empleado}/horario`);
+            const data = await res.json();
+            if (data.exito) {
+                data.materias.forEach(m => {
+                    m.horario_detallado.forEach(h => {
+                        const cell = document.getElementById(`${h.dia}-${h.bloque}`);
+                        if (cell) cell.innerHTML = `<div class="clase-profe"><strong>${m.clave_materia}</strong><br>${m.grupo}</div>`;
+                    });
+                });
+            }
+        }
+        init();
+    </script>
+</body>
+
+</html>

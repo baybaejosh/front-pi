@@ -1,0 +1,39 @@
+<div class="kardex-container">
+    <h2>📝 Calificaciones del Semestre</h2>
+    <table id="tablaParciales">
+        <thead>
+            <tr>
+                <th>Materia</th>
+                <th>Grupo</th>
+                <th>P1</th>
+                <th>P2</th>
+                <th>P3</th>
+                <th>Final</th>
+            </tr>
+        </thead>
+        <tbody id="cuerpoCalificaciones"></tbody>
+    </table>
+</div>
+
+<script>
+    async function cargarCalificaciones() {
+        const usuario = JSON.parse(localStorage.getItem('saes_usuario'));
+        const res = await fetch(`${API_GO_URL}/alumno/${usuario.boleta_empleado}/calificaciones`);
+        const { data } = await res.json();
+
+        const tbody = document.getElementById('cuerpoCalificaciones');
+        data.forEach(g => {
+            // Aquí podrías calcular el promedio si P1, P2 y P3 ya existen
+            tbody.innerHTML += `
+                <tr>
+                    <td>${g.clave_materia}</td>
+                    <td>${g.grupo}</td>
+                    <td>${g.p1 || '-'}</td>
+                    <td>${g.p2 || '-'}</td>
+                    <td>${g.p3 || '-'}</td>
+                    <td><strong>${g.final || '-'}</strong></td>
+                </tr>`;
+        });
+    }
+    window.onload = cargarCalificaciones;
+</script>

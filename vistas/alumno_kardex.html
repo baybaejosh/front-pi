@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAES - Mi Historial Académico</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        .kardex-container {
+            max-width: 900px;
+            margin: 20px auto;
+            width: 100%;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .header {
+            background: #6c1d45;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-volver {
+            background: #fff;
+            color: #6c1d45;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .info-alumno {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            border-left: 5px solid #6c1d45;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 25px;
+        }
+
+        th,
+        td {
+            border: 1px solid #e0e0e0;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #6c1d45;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        .promedio-box {
+            background: #e0e0e0;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 25px;
+            text-align: right;
+            font-size: 20px;
+            font-weight: bold;
+            color: #6c1d45;
+        }
+    </style>
+    <link rel="stylesheet" href="../css/styles.css">
+    <script src="../js/api_config.js"></script>
+</head>
+
+<body>
+
+    <div class="kardex-container">
+        <div class="header">
+            <h2>🎓 Mi Historial Académico</h2>
+            <button class="btn-volver" onclick="window.location.href='../dashboard.html'">⬅ Volver al Menú</button>
+        </div>
+
+        <div class="info-alumno" id="infoAlumno">
+            <p>Cargando datos institucionales...</p>
+        </div>
+
+        <table id="tablaKardex">
+            <thead>
+                <tr>
+                    <th>Semestre</th>
+                    <th>Clave</th>
+                    <th>Unidad de Aprendizaje</th>
+                    <th>Calificación Final</th>
+                </tr>
+            </thead>
+            <tbody id="cuerpoKardex">
+            </tbody>
+        </table>
+
+        <div class="promedio-box" id="promedioGlobal">
+            Promedio Global: Calculando...
+        </div>
+    </div>
+
+    <script>
+        async function cargarKardex() {
+            // 1. Buscamos la misma caja de sesión
+            const usuarioString = localStorage.getItem('saes_usuario');
+
+            if (!usuarioString) {
+                alert("Error: No se encontró tu sesión.");
+                window.location.href = '../index.html';
+                return;
+            }
+
+            // 2. La desempacamos y sacamos la boleta real
+            const usuario = JSON.parse(usuarioString);
+            const boleta = usuario.boleta_empleado;
+
+            try {
+                // Hacemos la petición a la API de Go
+                const response = await fetch(`${API_GO_URL}/kardex/${boleta}`);
+                const data = await response.json();
+
+                if (data.exito) {
+                    const kardex = data.data;
+
+                    // 1. Llenamos tus datos generales
+                    document.getElementById('infoAlumno').innerHTML = `
+                        <p><strong>Boleta:</strong> ${kardex.boleta}</p>
+                        <p><strong>Programa:</strong> ${kardex.carrera}</p>
+                        <p><strong>Plan de Estudios:</strong> ${kardex.plan}</p>
+                        <p><strong>Sede:</strong> ESIME Culhuacán</p>
+                    `;
+
+                    // 2. Llenamos el promedio
+                    document.getElementById('promedioGlobal').innerText = `Promedio Global: ${kardex.promedio_global}`;
+
+                    // 3. Llenamos la tabla de calificaciones
+                    const tbody = document.getElementById('cuerpoKardex');
+                    tbody.innerHTML = '';
+
+                    kardex.historial.forEach(semestre => {
+                        semestre.materias.forEach(materia => {
+                            let fila = `<tr>
+                                <td>${semestre.semestre}</td>
+                                <td>${materia.clave}</td>
+                                <td>${materia.materia}</td>
+                                <td><strong>${materia.calificacion}</strong></td>
+                            </tr>`;
+                            tbody.innerHTML += fila;
+                        });
+                    });
+
+                } else {
+                    document.getElementById('infoAlumno').innerHTML = `<p style="color:red;">No se encontró el Kardex para la boleta ${boleta}.</p>`;
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                document.getElementById('infoAlumno').innerHTML = `<p style="color:red;">Error conectando con el servidor académico.</p>`;
+            }
+        }
+
+        // Disparamos la función en cuanto abra la página
+        window.onload = cargarKardex;
+    </script>
+</body>
+
+</html>

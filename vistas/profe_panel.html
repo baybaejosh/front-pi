@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>SAES - Panel Docente</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <script src="../js/api_config.js"></script>
+    <style>
+        .profe-container {
+            max-width: 1000px;
+            margin: 20px auto;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .controles {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            background: #f4f4f4;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        select {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+
+        th {
+            background: #6c1d45;
+            color: white;
+        }
+
+        .np-option {
+            color: #dc3545;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="profe-container">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>👨‍🏫 Asignación de Calificaciones</h2>
+            <button class="btn-guinda" onclick="window.location.href='../dashboard.html'">Volver</button>
+        </div>
+
+        <div class="controles">
+            <div>
+                <label>Seleccionar Grupo:</label>
+                <select id="selectGrupo" onchange="cargarAlumnos()">
+                    <option value="">-- Seleccione --</option>
+                    <option value="5CM11">5CM11 (Compiladores)</option>
+                </select>
+            </div>
+            <div>
+                <label>Parcial a Evaluar:</label>
+                <select id="selectParcial">
+                    <option value="p1">Primer Parcial</option>
+                    <option value="p2">Segundo Parcial</option>
+                    <option value="p3">Tercer Parcial</option>
+                </select>
+            </div>
+        </div>
+
+        <table id="tablaCalificaciones">
+            <thead>
+                <tr>
+                    <th>Boleta</th>
+                    <th>Nombre del Alumno</th>
+                    <th>Calificación</th>
+                </tr>
+            </thead>
+            <tbody id="listaAlumnos">
+            </tbody>
+        </table>
+
+        <button class="btn-guinda" style="margin-top: 20px; width: 100%;" onclick="guardarTodo()">Guardar Calificaciones
+            del Parcial</button>
+    </div>
+
+    <script>
+        async function cargarAlumnos() {
+            const grupo = document.getElementById('selectGrupo').value;
+            if (!grupo) return;
+
+            try {
+                const response = await fetch(`${API_GO_URL}/grupos/${grupo}/alumnos`);
+                const data = await response.json();
+
+                const tbody = document.getElementById('listaAlumnos');
+                tbody.innerHTML = '';
+
+                data.alumnos.forEach(alumno => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${alumno.boleta}</td>
+                            <td style="text-align: left;">${alumno.nombre}</td>
+                            <td>
+                                <select class="nota-input" data-boleta="${alumno.boleta}">
+                                    <option value="NP">NP</option>
+                                    ${[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => `<option value="${n}">${n}</option>`).join('')}
+                                </select>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (error) {
+                alert("Error al cargar la lista de alumnos.");
+            }
+        }
+
+        async function guardarTodo() {
+            const parcial = document.getElementById('selectParcial').value;
+            const notas = document.querySelectorAll('.nota-input');
+            const calificaciones = [];
+
+            notas.forEach(input => {
+                calificaciones.push({
+                    boleta: input.getAttribute('data-boleta'),
+                    nota: input.value
+                });
+            });
+
+            console.log("Enviando a Go:", { parcial, calificaciones });
+            alert(`✅ Calificaciones del ${parcial} enviadas con éxito (Simulado)`);
+        }
+    </script>
+</body>
+
+</html>

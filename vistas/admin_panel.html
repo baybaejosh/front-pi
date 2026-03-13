@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAES - Panel de Administración</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        .admin-container {
+            max-width: 900px;
+            margin: 20px auto;
+            width: 100%;
+        }
+
+        .header {
+            background: #6c1d45;
+            color: white;
+            padding: 20px;
+            border-radius: 10px 10px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-volver {
+            background: #fff;
+            color: #6c1d45;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* Diseño de Pestañas */
+        .tabs {
+            display: flex;
+            background: #e0e0e0;
+            border-radius: 0 0 10px 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            color: #555;
+            transition: 0.3s;
+        }
+
+        .tab-btn:hover {
+            background: #d0d0d0;
+        }
+
+        .tab-btn.active {
+            background: white;
+            color: #6c1d45;
+            border-bottom: 3px solid #6c1d45;
+        }
+
+        .tab-content {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+    </style>
+    <link rel="stylesheet" href="../css/styles.css">
+    <script src="../js/api_config.js"></script>
+</head>
+
+<body>
+
+    <div class="admin-container">
+        <div class="header">
+            <h2>⚙️ Gestión Escolar (Root)</h2>
+            <button class="btn-volver" onclick="window.location.href='../dashboard.html'">⬅ Volver al Menú</button>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="cambiarPestaña(event, 'tabUsuarios')">👤 Alta de Usuarios</button>
+            <button class="tab-btn" onclick="cambiarPestaña(event, 'tabGrupos')">📅 Apertura de Grupos</button>
+        </div>
+
+        <div id="tabUsuarios" class="tab-content active">
+            <h3 style="margin-bottom: 20px; color: #6c1d45;">Registrar Nuevo Usuario</h3>
+            <form id="formCrearUsuario">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Boleta / RFC</label>
+                        <input type="text" id="nuevoId" required placeholder="Ej. 2022350438">
+                    </div>
+                    <div class="form-group">
+                        <label>Rol en el Sistema</label>
+                        <select id="nuevoRol"
+                            style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+                            <option value="Alumno">Alumno</option>
+                            <option value="Profesor">Profesor</option>
+                            <option value="Administrador">Administrador</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Nombre(s)</label>
+                        <input type="text" id="nuevoNombre" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Apellidos</label>
+                        <input type="text" id="nuevoApellidos" required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Contraseña Temporal</label>
+                        <input type="text" id="nuevaPass" required value="temporal123">
+                    </div>
+                </div>
+                <button type="submit" class="btn-guinda" style="margin-top: 20px;">Crear Usuario</button>
+            </form>
+        </div>
+
+        <div id="tabGrupos" class="tab-content">
+            <h3 style="margin-bottom: 20px; color: #6c1d45;">Abrir Grupo / Horario</h3>
+            <form id="formCrearGrupo">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Clave de la Materia</label>
+                        <input type="text" id="claveMateria" required placeholder="Ej. C101 (Cálculo)">
+                    </div>
+                    <div class="form-group">
+                        <label>Nombre del Grupo</label>
+                        <input type="text" id="nombreGrupo" required placeholder="Ej. 5CM11">
+                    </div>
+                    <div class="form-group">
+                        <label>RFC del Profesor Asignado</label>
+                        <input type="text" id="rfcProfesor" required placeholder="Ej. EMP-5555">
+                    </div>
+                    <div class="form-group">
+                        <label>Cupo Máximo</label>
+                        <input type="number" id="cupoMaximo" required value="30" min="1" max="50">
+                    </div>
+                    <div class="form-group full-width">
+                        <label
+                            style="display: block; margin-bottom: 10px; font-weight: bold; color: #6c1d45;">Configuración
+                            de Horario Semanal</label>
+                        <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                            <thead>
+                                <tr style="background: #f4f4f4;">
+                                    <th style="padding: 8px; border: 1px solid #ddd;">Día</th>
+                                    <th style="padding: 8px; border: 1px solid #ddd;">Bloque de Horario</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaHorarioAdmin">
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <script>
+                        // Lista de días y bloques para generar la tabla dinámicamente
+                        const diasSemana = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];
+                        const opcionesHorario = `
+        <option value="NA">-- No Aplica --</option>
+        <optgroup label="Matutino">
+            <option value="07:00-08:30">07:00 - 08:30</option>
+            <option value="08:30-10:00">08:30 - 10:00</option>
+            <option value="10:30-12:00">10:30 - 12:00</option>
+            <option value="12:00-13:30">12:00 - 13:30</option>
+        </optgroup>
+        <optgroup label="Vespertino">
+            <option value="16:00-17:30">16:00 - 17:30</option>
+            <option value="17:30-19:00">17:30 - 19:00</option>
+            <option value="19:00-20:30">19:00 - 20:30</option>
+            <option value="20:30-22:00">20:30 - 22:00</option>
+        </optgroup>`;
+
+                        const tbody = document.getElementById('tablaHorarioAdmin');
+                        diasSemana.forEach(dia => {
+                            tbody.innerHTML += `
+            <tr>
+                <td style="padding: 5px; border: 1px solid #ddd;"><strong>${dia}</strong></td>
+                <td style="padding: 5px; border: 1px solid #ddd;">
+                    <select class="sel-horario" data-dia="${dia}" style="width: 100%; padding: 5px;">
+                        ${opcionesHorario}
+                    </select>
+                </td>
+            </tr>`;
+                        });
+                    </script>
+                </div>
+                <button type="submit" class="btn-guinda" style="margin-top: 20px;">Abrir Grupo en el Sistema</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function cambiarPestaña(evt, idPestaña) {
+            // Ocultamos todo el contenido
+            let contenidos = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < contenidos.length; i++) {
+                contenidos[i].classList.remove("active");
+            }
+            // Quitamos la clase active de los botones
+            let botones = document.getElementsByClassName("tab-btn");
+            for (let i = 0; i < botones.length; i++) {
+                botones[i].classList.remove("active");
+            }
+            // Mostramos la pestaña clickeada
+            document.getElementById(idPestaña).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+
+        // Aquí prepararemos los Fetch() en el siguiente paso
+        // Conexión real para Crear Usuario
+        document.getElementById('formCrearUsuario').addEventListener('submit', async (e) => {
+            e.preventDefault(); // Evita que la página parpadee o se recargue
+
+            // Capturamos lo que el admin escribió
+            const payload = {
+                identificador: document.getElementById('nuevoId').value,
+                rol: document.getElementById('nuevoRol').value,
+                nombre: document.getElementById('nuevoNombre').value,
+                apellidos: document.getElementById('nuevoApellidos').value,
+                password: document.getElementById('nuevaPass').value
+            };
+
+            try {
+                // Usamos la constante que definiste en api_config.js
+                // Asegúrate de que API_BASE_URL esté disponible en este archivo
+                const response = await fetch(`${API_BASE_URL}/usuarios`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (data.exito) {
+                    alert('✅ ' + data.mensaje);
+                    document.getElementById('formCrearUsuario').reset(); // Limpiamos el formulario
+                } else {
+                    alert('❌ Error: ' + data.mensaje);
+                }
+            } catch (error) {
+                alert('❌ Error de conexión con la API de Identidad (Node.js).');
+                console.error(error);
+            }
+        });
+
+        // Conexión real para Apertura de Grupos
+        // Conexión real para Apertura de Grupos (Corregido)
+        document.getElementById('formCrearGrupo').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Capturamos los datos de la tabla de horario
+            const selects = document.querySelectorAll('.sel-horario');
+            let horarioFinal = [];
+
+            selects.forEach(select => {
+                if (select.value !== "NA") {
+                    horarioFinal.push({
+                        dia: select.getAttribute('data-dia'),
+                        bloque: select.value
+                    });
+                }
+            });
+
+            // Validar que al menos se haya seleccionado un día
+            if (horarioFinal.length === 0) {
+                alert('❌ Debes asignar al menos un día y bloque de horario.');
+                return;
+            }
+
+            const payload = {
+                clave_materia: document.getElementById('claveMateria').value,
+                nombre_grupo: document.getElementById('nombreGrupo').value,
+                rfc_profesor: document.getElementById('rfcProfesor').value,
+                cupo_maximo: parseInt(document.getElementById('cupoMaximo').value),
+                horario: horarioFinal
+            };
+
+            try {
+                // Usamos la URL de Ngrok para Go (Puerto 5000)
+                const response = await fetch(`${API_GO_URL}/grupos`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (data.exito) {
+                    alert('✅ ' + data.mensaje);
+                    document.getElementById('formCrearGrupo').reset();
+                    // Resetear selects de la tabla a "NA" manualmente si es necesario
+                    document.querySelectorAll('.sel-horario').forEach(s => s.value = "NA");
+                } else {
+                    alert('❌ Error: ' + data.mensaje);
+                }
+            } catch (error) {
+                alert('❌ Error de conexión con la API Académica (Go/Ngrok).');
+                console.error(error);
+            }
+        });
+    </script>
+</body>
+
+</html>

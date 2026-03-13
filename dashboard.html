@@ -1,22 +1,64 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SAES ESIME - Panel Principal</title>
     <link rel="stylesheet" href="css/styles.css">
     <style>
-        /* Estilos extra solo para el dashboard */
-        .dashboard-container { max-width: 800px; padding: 20px; width: 100%; margin: 0 auto; }
-        .header { background: #6c1d45; color: white; padding: 20px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;}
-        .modulos { display: none; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 15px;}
-        .modulos h3 { border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 15px; color: #333; }
-        .grid-botones { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
-        .btn-logout { background: #dc3545; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; }
+        .dashboard-container {
+            max-width: 800px;
+            padding: 20px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: #6c1d45;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modulos {
+            display: none;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-bottom: 15px;
+        }
+
+        .modulos h3 {
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .grid-botones {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+        }
+
+        .btn-logout {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
     </style>
 </head>
-<body>
 
+<body>
     <div class="dashboard-container">
         <div class="header">
             <div>
@@ -29,28 +71,38 @@
         <div id="panelAdmin" class="modulos">
             <h3>⚙️ Gestión Escolar (Administrador)</h3>
             <div class="grid-botones">
-                <button class="btn-guinda" onclick="irA('vistas/admin_panel.html')">Registrar Alumnos / Usuarios</button>
-                <button class="btn-guinda" onclick="irA('vistas/admin_panel.html')">Consultar Matrícula Global</button>
+                <button class="btn-guinda" onclick="irA('vistas/admin_panel.html')">Registrar Alumnos /
+                    Usuarios</button>
+                <button class="btn-guinda" onclick="irA('vistas/admin_panel.html')">Apertura de Grupos y
+                    Horarios</button>
             </div>
         </div>
 
         <div id="panelProfe" class="modulos">
             <h3>👨‍🏫 Panel Docente</h3>
             <div class="grid-botones">
-                <button class="btn-guinda" onclick="irA('vistas/profe_panel.html')">Asignar Calificaciones</button>
-                <button class="btn-guinda" onclick="irA('vistas/profe_panel.html')">Ver Lista de Alumnos</button>
+                <button class="btn-guinda" onclick="irA('vistas/profe_panel.html')">Asignar Calificaciones
+                    (Parciales)</button>
+                <button class="btn-guinda" onclick="irA('vistas/profe_horario.html')">Ver Mi Horario de Clase</button>
+                <button class="btn-guinda" onclick="irA('vistas/profe_listas.html')">Ver Lista de Alumnos</button>
             </div>
         </div>
 
         <div id="panelAlumno" class="modulos">
             <h3>🎓 Portal del Alumno</h3>
             <div class="grid-botones">
-                <button class="btn-guinda" onclick="irA('vistas/alumno_panel.html')">Mi Historial Académico</button>
-                <button class="btn-guinda" onclick="irA('vistas/alumno_panel.html')">Generar Kardex (Oficial)</button>
+                <button class="btn-guinda" onclick="irA('vistas/alumno_inscripcion.html')">Inscripción de
+                    Materias</button>
+                <button class="btn-guinda" onclick="irA('vistas/alumno_horario.html')">Ver Mi Horario Actual</button>
+                <button class="btn-guinda" onclick="irA('vistas/alumno_kardex.html')">Mi Historial Académico
+                    (Kardex)</button>
+                <button class="btn-guinda" onclick="irA('vistas/alumno_calificaciones.html')">Calificaciones del
+                    Semestre</button>
             </div>
         </div>
     </div>
 
     <script src="js/dashboard.js"></script>
 </body>
+
 </html>

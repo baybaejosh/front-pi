@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>SAES ESIME - Mi Horario</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <script src="../js/api_config.js"></script>
+    <style>
+        .horario-container {
+            max-width: 1000px;
+            margin: 20px auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-horario {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #6c1d45;
+            padding-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+            height: 70px;
+            vertical-align: middle;
+        }
+
+        th {
+            background: #6c1d45;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .bloque-hora {
+            background: #f4f4f4;
+            font-weight: bold;
+            color: #6c1d45;
+            width: 110px;
+            font-size: 0.8rem;
+        }
+
+        /* Estilo para la materia cuando aparezca en el horario */
+        .clase-card {
+            background: #e8f4fd;
+            border-left: 4px solid #2196f3;
+            color: #0d47a1;
+            padding: 5px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .clase-card strong {
+            display: block;
+            margin-bottom: 3px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="horario-container">
+        <div class="header-horario">
+            <h2>📅 Horario Semanal</h2>
+            <button class="btn-guinda" onclick="window.location.href='../dashboard.html'">Volver al Panel</button>
+        </div>
+
+        <table id="tablaHorario">
+            <thead>
+                <tr>
+                    <th class="bloque-hora">Hora</th>
+                    <th>Lunes</th>
+                    <th>Martes</th>
+                    <th>Miércoles</th>
+                    <th>Jueves</th>
+                    <th>Viernes</th>
+                </tr>
+            </thead>
+            <tbody id="cuerpoHorario">
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Definimos los bloques oficiales de 1:30 hrs
+        const bloques = [
+            "07:00-08:30", "08:30-10:00", "10:30-12:00", "12:00-13:30",
+            "16:00-17:30", "17:30-19:00", "19:00-20:30", "20:30-22:00"
+        ];
+        const dias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];
+
+        function inicializarTabla() {
+            const tbody = document.getElementById('cuerpoHorario');
+            bloques.forEach(bloque => {
+                let fila = `<tr><td class="bloque-hora">${bloque}</td>`;
+                dias.forEach(dia => {
+                    // ID único por celda para pintar la materia después
+                    fila += `<td id="${dia}-${bloque}"></td>`;
+                });
+                fila += `</tr>`;
+                tbody.innerHTML += fila;
+            });
+        }
+
+        async function cargarHorario() {
+            const usuarioString = localStorage.getItem('saes_usuario');
+            if (!usuarioString) return;
+            const usuario = JSON.parse(usuarioString);
+
+            try {
+                // Llamamos a la Ruta 8 de Go que te pasé
+                const res = await fetch(`${API_GO_URL}/alumno/${usuario.boleta_empleado}/horario`);
+                const data = await res.json();
+
+                if (data.exito) {
+                    data.materias.forEach(materia => {
+                        // Recorremos el horario_detallado que guardó el Admin
+                        materia.horario_detallado.forEach(h => {
+                            const idCelda = `${h.dia}-${h.bloque}`;
+                            const celda = document.getElementById(idCelda);
+                            if (celda) {
+                                celda.innerHTML = `
+                                    <div class="clase-card">
+                                        <strong>${materia.clave_materia}</strong>
+                                        <span>${materia.grupo}</span>
+                                    </div>
+                                `;
+                            }
+                        });
+                    });
+                }
+            } catch (error) {
+                console.error("Error cargando horario:", error);
+            }
+        }
+
+        // Ejecutar al cargar
+        inicializarTabla();
+        cargarHorario();
+    </script>
+</body>
+
+</html>

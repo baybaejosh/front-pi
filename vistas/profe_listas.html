@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>SAES - Listas de Alumnos</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <script src="../js/api_config.js"></script>
+</head>
+
+<body>
+    <div class="dashboard-container" style="max-width: 900px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2>👥 Listas de Alumnos por Grupo</h2>
+            <button class="btn-guinda" onclick="window.location.href='../dashboard.html'">Volver</button>
+        </div>
+
+        <div class="form-group">
+            <label>Selecciona un Grupo:</label>
+            <select id="selectGrupoListas" onchange="obtenerLista()" style="width: 100%; padding: 10px;">
+                <option value="">-- Seleccione Grupo --</option>
+                <option value="5CM11">5CM11 (Compiladores)</option>
+            </select>
+        </div>
+
+        <table style="width: 100%; margin-top: 20px; border-collapse: collapse;">
+            <thead>
+                <tr style="background: #6c1d45; color: white;">
+                    <th style="padding: 10px; border: 1px solid #ddd;">#</th>
+                    <th style="padding: 10px; border: 1px solid #ddd;">Boleta</th>
+                    <th style="padding: 10px; border: 1px solid #ddd;">Nombre del Alumno</th>
+                </tr>
+            </thead>
+            <tbody id="tablaListaAlumnos">
+                <tr>
+                    <td colspan="3" style="text-align: center; padding: 20px;">Selecciona un grupo para ver la lista.
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        async function obtenerLista() {
+            const grupo = document.getElementById('selectGrupoListas').value;
+            if (!grupo) return;
+
+            const res = await fetch(`${API_GO_URL}/grupos/${grupo}/alumnos`);
+            const data = await res.json();
+
+            const tbody = document.getElementById('tablaListaAlumnos');
+            tbody.innerHTML = '';
+
+            if (data.exito && data.alumnos.length > 0) {
+                data.alumnos.forEach((al, index) => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #ddd; text-align:center;">${index + 1}</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">${al.boleta}</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">${al.nombre}</td>
+                        </tr>`;
+                });
+            } else {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">No hay alumnos inscritos.</td></tr>';
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>SAES - Inscripción de Materias</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <script src="../js/api_config.js"></script>
+    <style>
+        .inscripcion-container {
+            max-width: 1000px;
+            margin: 20px auto;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+        }
+
+        .bolsa-creditos {
+            background: #6c1d45;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+        }
+
+        .busqueda-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .card-materia {
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .info-materia h4 {
+            margin: 0;
+            color: #6c1d45;
+        }
+
+        .tag-creditos {
+            background: #e8e8e8;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="inscripcion-container">
+        <div class="bolsa-creditos">
+            <span>Créditos Disponibles: <strong id="misCreditos">60.0</strong></span>
+            <span>Total a Pagar: <strong id="costoTotal">0.0</strong></span>
+        </div>
+
+        <div class="busqueda-box">
+            <input type="text" id="inputBusqueda" placeholder="Buscar por materia, profesor o grupo..."
+                style="flex:1; padding: 10px;">
+            <button class="btn-guinda" onclick="buscarMaterias()">🔍 Buscar</button>
+        </div>
+
+        <div id="resultadosBusqueda">
+        </div>
+
+        <hr>
+        <h3>Materias Seleccionadas</h3>
+        <div id="materiasElegidas"></div>
+
+        <button class="btn-guinda" style="width: 100%; margin-top: 20px; padding: 15px;"
+            onclick="confirmarInscripcion()">Confirmar Inscripción</button>
+    </div>
+
+    <script>
+        // Simulamos los créditos que nos da el sistema al inicio
+        let creditosDisponibles = 60.0;
+        let carrito = [];
+
+        async function buscarMaterias() {
+            const query = document.getElementById('inputBusqueda').value;
+            // Aquí llamaríamos a una nueva ruta de Go: GET /api/grupos/buscar?q=...
+            const res = await fetch(`${API_GO_URL}/grupos`); // Por ahora traemos todos
+            const data = await res.json();
+
+            const contenedor = document.getElementById('resultadosBusqueda');
+            contenedor.innerHTML = '';
+
+            // Simulamos que filtramos por nombre/profe/grupo
+            data.data.forEach(grupo => {
+                contenedor.innerHTML += `
+                    <div class="card-materia">
+                        <div class="info-materia">
+                            <h4>${grupo.grupo} - ${grupo.clave_materia}</h4>
+                            <p>Profesor: ${grupo.rfc_profesor}</p>
+                            <small>Horario: ${grupo.horario_detallado.map(h => h.dia + ' ' + h.bloque).join(', ')}</small>
+                        </div>
+                        <div style="text-align: right;">
+                            <span class="tag-creditos">9.0 Créditos</span><br><br>
+                            <button class="btn-guinda" onclick="agregarMateria('${grupo.grupo}', 9.0)">Inscribir</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+    </script>
+</body>
+
+</html>

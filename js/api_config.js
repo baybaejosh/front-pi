@@ -1,7 +1,8 @@
 // /js/api_config.js
 
 // URL base de tu compañero de Java (Ngrok)
-const API_BASE_URL = "https://untempestuous-contently-lesley.ngrok-free.dev/GestionEscolarAPI/api";
+// const API_BASE_URL = "http://localhost:4000/api";
+const API_BASE_URL = "https://7f3c-2806-2f0-92a0-e8d3-00-d.ngrok-free.app/api";
 
-// URL base de tu compañero de Python (Para el Kardex, la pondremos después)
- const API_PYTHON_URL = "https://laverna-urinous-haley.ngrok-free.dev/api";
+// const API_GO_URL = "http://localhost:5000/api";
+const API_GO_URL = "https://unphonnetically-unnegotiable-damon.ngrok-free.dev/api";

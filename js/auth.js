@@ -1,6 +1,6 @@
 // /js/auth.js
 
-document.getElementById('loginForm').addEventListener('submit', async function(event) {
+document.getElementById('loginForm').addEventListener('submit', async function (event) {
     // Evitamos que la página se recargue al darle enter
     event.preventDefault();
 
@@ -15,7 +15,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
     mensajeError.style.display = "none";
 
     try {
-        // Hacemos la petición a la API de tu compañero usando la variable global
+        // Hacemos la petición a la API de Node usando la variable global
         const response = await fetch(`${API_BASE_URL}/auth/login`, {
             method: 'POST',
             headers: {
@@ -28,19 +28,22 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
             })
         });
 
-        if (response.ok) {
-            const data = await response.json();
-            
-            // Validamos la llave "exito" que nos mandó tu compañero
-            if (data.exito === true) {
-                // Guardamos el JSON enterito en memoria
-                localStorage.setItem('saes_usuario', JSON.stringify(data));
-                window.location.href = "dashboard.html";
-            } else {
-                mensajeError.innerText = "Credenciales incorrectas.";
-                mensajeError.style.display = "block";
-            }
+        // Leemos el JSON sin importar si fue error 401 o éxito 200
+        const data = await response.json();
+
+        // Validamos la llave "exito" 
+        if (data.exito === true) {
+            // ¡AQUÍ ESTÁ LA MAGIA! Guardamos TODO el objeto para que el Dashboard no te rechace
+            localStorage.setItem('saes_usuario', JSON.stringify(data));
+
+            // Redirigimos al panel
+            window.location.href = "dashboard.html";
+        } else {
+            // Si mandaste mal la boleta o pass, ahora sí te saldrá el texto rojo
+            mensajeError.innerText = data.mensaje || "Credenciales incorrectas.";
+            mensajeError.style.display = "block";
         }
+
     } catch (error) {
         console.error("Error al conectar con la API:", error);
         mensajeError.innerText = "Error de conexión con el servidor.";
