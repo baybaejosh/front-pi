@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Propuesta SAES con GitHub</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #f0f2f5; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding-top: 50px; 
+        }
+        .card { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+            max-width: 600px; 
+            width: 90%; 
+            text-align: center; 
+        }
+        button { 
+            background-color: #6c1d45; /* Un toque guinda politécnico */
+            color: white; 
+            border: none; 
+            padding: 12px 24px; 
+            font-size: 16px; 
+            font-weight: bold;
+            border-radius: 5px; 
+            cursor: pointer; 
+            margin-top: 15px; 
+            transition: background 0.3s; 
+        }
+        button:hover { background-color: #4a132f; }
+        button:disabled { background-color: #ccc; cursor: not-allowed; }
+        pre { 
+            background: #282c34; 
+            color: #61afef; 
+            padding: 15px; 
+            border-radius: 5px; 
+            text-align: left; 
+            overflow-x: auto; 
+            margin-top: 20px; 
+            font-size: 14px; 
+        }
+        .loader { display: none; margin-top: 15px; color: #666; font-style: italic; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2>Propuesta SAES con GitHub</h2>
+        <p>Prueba de conexión Frontend -> Ngrok -> Nginx -> Python/Java</p>
+        
+        <button id="btnProbar" onclick="probarAPI()">Generar Kardex (ID: 123)</button>
+        <div id="loading" class="loader">Consultando al servidor emisor...</div>
+        
+        <div id="resultadoContainer" style="display: none;">
+            <pre id="codigoJson"></pre>
+        </div>
+    </div>
+
+    <script>
+        // Tu idea implementada: La ruta base en un solo lugar
+        const API_URL = "https://laverna-urinous-haley.ngrok-free.dev/api/kardex/generar";
+
+        async function probarAPI() {
+            const btn = document.getElementById('btnProbar');
+            const loader = document.getElementById('loading');
+            const container = document.getElementById('resultadoContainer');
+            const jsonPantalla = document.getElementById('codigoJson');
+
+            // Cambiamos la interfaz a estado de "Cargando"
+            btn.disabled = true;
+            loader.style.display = "block";
+            container.style.display = "none";
+            jsonPantalla.textContent = "";
+
+            try {
+                // Hacemos la petición POST al Ngrok
+                const response = await fetch(API_URL, {
+                    method: 'POST', 
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        "alumno_id": "123"
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Error del servidor: ${response.status}`);
+                }
+
+                // Extraemos el JSON del payload
+                const data = await response.json();
+                
+                // Lo mostramos en pantalla con una indentación bonita de 4 espacios
+                jsonPantalla.textContent = JSON.stringify(data, null, 4);
+                container.style.display = "block";
+
+            } catch (error) {
+                console.error("Fallo en la comunicación:", error);
+                jsonPantalla.textContent = "Error de conexión.\n\n" + 
+                                         "1. Revisa que Ngrok siga corriendo.\n" + 
+                                         "2. Revisa la consola del navegador (F12) por si hay un error de CORS.\n\n" + 
+                                         "Detalle: " + error.message;
+                container.style.display = "block";
+            } finally {
+                // Restauramos el botón
+                btn.disabled = false;
+                loader.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>
