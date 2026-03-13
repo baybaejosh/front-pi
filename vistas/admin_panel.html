@@ -246,7 +246,10 @@
                 // Asegúrate de que API_BASE_URL esté disponible en este archivo
                 const response = await fetch(`${API_BASE_URL}/usuarios`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'ngrok-skip-browser-warning': 'true' // <--- ESTO ES VITAL
+                    },
                     body: JSON.stringify(payload)
                 });
 
