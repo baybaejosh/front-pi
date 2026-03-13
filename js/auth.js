@@ -28,21 +28,17 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
         });
 
         if (response.ok) {
-            // Si el Java nos responde con un 200 OK
             const data = await response.json();
             
-            /* NOTA: Tu compañero necesita devolverte en este JSON el "rol" y el "idUsuario".
-               Asumiendo que devuelve algo como: { idUsuario: 1, rol: "Admin", username: "..." }
-            */
-            
-            // Guardamos los datos en la memoria del navegador para usarlos en el Dashboard
-            localStorage.setItem('saes_usuario', JSON.stringify(data));
-
-            // ¡Redirigimos al Dashboard!
-            window.location.href = "dashboard.html";
-        } else {
-            // Error 401 o 400 (Credenciales inválidas)
-            mensajeError.style.display = "block";
+            // Validamos la llave "exito" que nos mandó tu compañero
+            if (data.exito === true) {
+                // Guardamos el JSON enterito en memoria
+                localStorage.setItem('saes_usuario', JSON.stringify(data));
+                window.location.href = "dashboard.html";
+            } else {
+                mensajeError.innerText = "Credenciales incorrectas.";
+                mensajeError.style.display = "block";
+            }
         }
     } catch (error) {
         console.error("Error al conectar con la API:", error);
